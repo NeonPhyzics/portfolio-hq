@@ -139,34 +139,81 @@
         "text": "For Faceless Video's move off GPT+Make: treat it as its own project — have Claude help extract your existing prompts/workflow first, then rebuild them as a single Claude Project's custom instructions, rather than starting over in freeform chat."
       }
     ],
-    "learningItems": [
+    "learningThreads": [
       {
-        "id": "learning-custom-skills",
-        "summary": "Learning how to create custom Claude skills (via claude.ai)",
+        "id": "LT-01",
+        "title": "Custom Claude Skills",
         "status": "open",
-        "firstSeen": "2026-07-06",
-        "note": "No concrete takeaway reported yet."
+        "since": "2026-07-06",
+        "linked_project": "Exit Ready HR",
+        "build": "Exit Ready HR deliverable skill — packages frameworks, tone, and document standards for consistent client deliverables",
+        "next_action": "In a Claude Code session, ask for the skill-creator guide and scaffold the skill folder (SKILL.md + templates)",
+        "done_when": "Skill produces a client-ready deliverable draft in one pass without manual tone/format correction",
+        "backlog": [
+          "Transaction-categorization skill for Wave bookkeeping across all entities"
+        ],
+        "note": ""
       },
       {
-        "id": "learning-settings-improvements",
-        "summary": "Learning how to improve Claude settings/configuration (via claude.ai)",
+        "id": "LT-02",
+        "title": "Claude Settings & Configuration",
         "status": "open",
-        "firstSeen": "2026-07-06",
-        "note": "No concrete takeaway reported yet."
+        "since": "2026-07-06",
+        "linked_project": "All Claude Projects",
+        "build": "Fully configured 3-Project stack (Exit Ready HR, Neon Dreamhouse AI, Faceless Video)",
+        "next_action": "Write project instructions for Exit Ready HR Project",
+        "done_when": "All 3 Projects have instructions + knowledge files, a LinkedIn voice style exists, and memory edits reviewed once — then CLOSE this thread",
+        "backlog": [
+          "Write instructions for Neon Dreamhouse AI Project",
+          "Write instructions for consolidated Faceless Video Project",
+          "Create LinkedIn voice style",
+          "Quarterly memory-edit prune (recurring)"
+        ],
+        "note": ""
       },
       {
-        "id": "learning-github-version-control",
-        "summary": "GitHub / version control fundamentals",
+        "id": "LT-03",
+        "title": "Git & GitHub Fundamentals",
         "status": "open",
-        "firstSeen": "2026-07-07",
-        "note": "Started with the Portfolio HQ build — first real repo/push/deploy workflow."
+        "since": "2026-07-07",
+        "linked_project": "Portfolio HQ / Neon Dreamhouse AI",
+        "build": "Manual version control of Portfolio HQ data updates",
+        "next_action": "Make the next data.json update via command line yourself: edit, git add, git commit -m, git push — no Claude Code assist",
+        "done_when": "10 manual commit/push cycles completed and one branch merged without help",
+        "backlog": [
+          "Create a branch, make a change, merge it",
+          "Intentionally break something, then git revert"
+        ],
+        "note": ""
       },
       {
-        "id": "learning-ai-code-review",
-        "summary": "Code review — reading and evaluating AI-generated code",
+        "id": "LT-04",
+        "title": "Code Review (Architect Skill)",
         "status": "open",
-        "firstSeen": "2026-07-07",
-        "note": "Needed across SCDP, Portfolio HQ, and Neon Dreamhouse AI as AI writes more of the actual code."
+        "since": "2026-07-07",
+        "linked_project": "Neon Dreamhouse AI",
+        "build": "Working fluency in reading and challenging AI-generated code",
+        "next_action": "In the Portfolio HQ session, have Claude walk through one file and explain its architecture choices; challenge at least one decision",
+        "done_when": "You can review a Quix or career-tool PR and identify one real issue or improvement unprompted, 3 sessions in a row",
+        "backlog": [
+          "Repeat walkthrough ritual each Claude Code build session (one file per session)"
+        ],
+        "note": ""
+      },
+      {
+        "id": "LT-05",
+        "title": "Prompt & Context Engineering",
+        "status": "open",
+        "since": "2026-07-07",
+        "linked_project": "All Claude Projects",
+        "build": "Self-authored knowledge files for all 3 Projects",
+        "next_action": "Draft the Exit Ready HR knowledge file yourself, then have Claude critique it — compare its rewrite to yours",
+        "done_when": "All 3 Project knowledge files self-authored, critiqued, and revised; you can articulate why each element is included",
+        "backlog": [
+          "Neon Dreamhouse AI knowledge file",
+          "Faceless Video knowledge file"
+        ],
+        "note": ""
       }
     ]
   },

@@ -78,6 +78,113 @@ function ActiveProjectsView() {
   )
 }
 
+function LearningThreadCard({ thread, onComplete, onClose, closed }) {
+  return (
+    <div className={`row-card lt-card ${closed ? 'lt-closed' : ''}`}>
+      <div className="lt-header">
+        <div>
+          <h3>{thread.title}</h3>
+          <span className="tag lt-project-tag">{thread.linked_project}</span>
+        </div>
+        <div className="lt-meta">
+          <span className={`badge ${thread.status === 'open' ? 'status-active' : 'status-deferred'}`}>
+            {thread.status}
+          </span>
+          <span className="lt-since">since {thread.since}</span>
+        </div>
+      </div>
+
+      {thread.build && <p className="lt-build">{thread.build}</p>}
+
+      {!closed && <div className="lt-next-action">{thread.next_action}</div>}
+
+      <div className="lt-donewhen">
+        <span className="lt-donewhen-label">Done when</span>
+        {thread.done_when}
+      </div>
+
+      {thread.backlog.length > 0 && (
+        <details className="lt-backlog">
+          <summary>Backlog ({thread.backlog.length})</summary>
+          <ul>
+            {thread.backlog.map((b, i) => (
+              <li key={i}>{b}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+
+      {thread.note && (
+        <div className="field next">
+          <div className="label">Note</div>
+          <div className="value">{thread.note}</div>
+        </div>
+      )}
+
+      {!closed && (
+        <div className="lt-actions">
+          {thread.backlog.length > 0 && (
+            <button className="lt-btn lt-btn-complete" onClick={onComplete}>
+              Complete → promote next backlog item
+            </button>
+          )}
+          <button className="lt-btn lt-btn-close" onClick={onClose}>
+            Close thread
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function LearningThreadsSection() {
+  const [threads, setThreads] = useState(() => data.skills.learningThreads.map((t) => ({ ...t })))
+
+  function completeNextAction(id) {
+    setThreads((prev) =>
+      prev.map((t) => {
+        if (t.id !== id || t.backlog.length === 0) return t
+        const [promoted, ...rest] = t.backlog
+        return { ...t, next_action: promoted, backlog: rest }
+      })
+    )
+  }
+
+  function closeThread(id) {
+    setThreads((prev) => prev.map((t) => (t.id === id ? { ...t, status: 'closed' } : t)))
+  }
+
+  const open = threads.filter((t) => t.status === 'open')
+  const closed = threads.filter((t) => t.status === 'closed')
+
+  return (
+    <section className="skills-section">
+      <h2>Learning Threads</h2>
+      <div className="list">
+        {open.map((t) => (
+          <LearningThreadCard
+            key={t.id}
+            thread={t}
+            onComplete={() => completeNextAction(t.id)}
+            onClose={() => closeThread(t.id)}
+          />
+        ))}
+      </div>
+
+      {closed.length > 0 && (
+        <details className="lt-closed-group">
+          <summary>Closed ({closed.length})</summary>
+          <div className="list">
+            {closed.map((t) => (
+              <LearningThreadCard key={t.id} thread={t} closed />
+            ))}
+          </div>
+        </details>
+      )}
+    </section>
+  )
+}
+
 function SkillsView() {
   return (
     <>
@@ -91,31 +198,7 @@ function SkillsView() {
         ))}
       </section>
 
-      <section className="skills-section">
-        <h2>Learning Threads</h2>
-        <div className="list">
-          {data.skills.learningItems.map((item) => (
-            <div className="row-card" key={item.id}>
-              <div className="row-top">
-                <h3>{item.summary}</h3>
-                <span className={`badge ${item.status === 'open' ? 'status-active' : 'status-deferred'}`}>
-                  {item.status}
-                </span>
-              </div>
-              <div className="field">
-                <div className="label">Since</div>
-                <div className="value">{item.firstSeen}</div>
-              </div>
-              {item.note && (
-                <div className="field next">
-                  <div className="label">Note</div>
-                  <div className="value">{item.note}</div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+      <LearningThreadsSection />
 
       <section className="skills-section">
         <h2>Proposed Actions</h2>
