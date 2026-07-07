@@ -1,0 +1,183 @@
+{
+  "meta": {
+    "title": "Portfolio HQ",
+    "tagline": "System of record for every venture, project, and skill in flight.",
+    "lastUpdated": "2026-07-07"
+  },
+  "ventures": [
+    {
+      "id": "exit-ready-hr",
+      "name": "Exit Ready HR",
+      "status": "Active",
+      "summary": "Fractional HR consulting for PE-backed and founder-led exits.",
+      "focus": "CRM build (Cowork), LinkedIn content engine.",
+      "next": "Consolidate into a single Claude Project.",
+      "detail": {
+        "notes": [],
+        "links": []
+      }
+    },
+    {
+      "id": "barbee-dreamhouse",
+      "name": "Barbee Dreamhouse",
+      "status": "Active",
+      "summary": "Luxury resale LLC.",
+      "focus": "Wave accounting setup.",
+      "next": "Finalize Wave profiles.",
+      "detail": {
+        "notes": [],
+        "links": []
+      }
+    },
+    {
+      "id": "rental-properties",
+      "name": "Rental Properties",
+      "status": "Active",
+      "summary": "Kipling, Marquette, Melody Oaks.",
+      "focus": "Wave setup.",
+      "next": "None open.",
+      "detail": {
+        "notes": [],
+        "links": []
+      }
+    },
+    {
+      "id": "faceless-video",
+      "name": "Faceless Video",
+      "status": "Active",
+      "summary": "TikTok/YT Shorts: true crime, Greek mythology, lucid dream, cosmic horror.",
+      "focus": "Consolidate to one Claude Project.",
+      "next": "Merge projects, kill GPT+Make pipeline.",
+      "detail": {
+        "notes": [],
+        "links": []
+      }
+    },
+    {
+      "id": "neon-dreamhouse-ai",
+      "name": "Neon Dreamhouse AI",
+      "status": "Building",
+      "summary": "Software products (neondreamhouse.ai).",
+      "focus": "Career pathing tool (Lovable/Claude Code), Quix behavioral assessment app.",
+      "next": "Migrate Quix scope from DeepSeek.",
+      "detail": {
+        "notes": [],
+        "links": []
+      }
+    }
+  ],
+  "activeProjects": [
+    {
+      "id": "portfolio-hq-build",
+      "name": "Portfolio HQ build",
+      "venture": null,
+      "status": "In progress",
+      "blocker": null,
+      "next": "Finish deploy pipeline, then hand-edit data.json going forward."
+    },
+    {
+      "id": "crm-build",
+      "name": "CRM build",
+      "venture": "exit-ready-hr",
+      "status": "In progress",
+      "blocker": null,
+      "next": "Continue build in Cowork."
+    },
+    {
+      "id": "quix-migration",
+      "name": "Quix migration + compliance review",
+      "venture": "neon-dreamhouse-ai",
+      "status": "In progress",
+      "blocker": "Scope currently owned by DeepSeek, needs migrating.",
+      "next": "Migrate Quix scope from DeepSeek and run compliance review."
+    },
+    {
+      "id": "neon-dreamhouse-website",
+      "name": "Neon Dreamhouse website",
+      "venture": "neon-dreamhouse-ai",
+      "status": "In progress",
+      "blocker": null,
+      "next": "Continue buildout (neondreamhouse.ai)."
+    },
+    {
+      "id": "wave-accounting-setup",
+      "name": "Wave accounting setup",
+      "venture": "barbee-dreamhouse",
+      "status": "In progress",
+      "blocker": null,
+      "next": "Finalize Wave profiles across Barbee Dreamhouse and Rental Properties."
+    },
+    {
+      "id": "claude-project-restructure",
+      "name": "Claude Project restructure",
+      "venture": null,
+      "status": "In progress",
+      "blocker": null,
+      "next": "Create Exit Ready HR + Neon Dreamhouse projects, merge Faceless Video projects into one."
+    },
+    {
+      "id": "cross-venture-privacy-standard",
+      "name": "Cross-venture data/privacy standard",
+      "venture": null,
+      "status": "Deferred",
+      "blocker": "Lower priority than active builds.",
+      "next": "Define once active builds stabilize."
+    }
+  ],
+  "skills": {
+    "nudges": [
+      {
+        "tag": "Cowork",
+        "text": "Your Cowork folder is live alongside Code on this same project. Since automated marks-done only happen via file writes (not conversation), get in the habit of confirming in whichever tool you used that day that the state actually got updated — don't assume a Cowork chat reply means the file changed."
+      },
+      {
+        "tag": "Habit",
+        "text": "Marking an item \"done\" only happens when you tell Claude directly — nothing closes itself automatically. Make it a two-second habit: after you review this dashboard, say what you actioned."
+      },
+      {
+        "tag": "Migration",
+        "text": "For Faceless Video's move off GPT+Make: treat it as its own project — have Claude help extract your existing prompts/workflow first, then rebuild them as a single Claude Project's custom instructions, rather than starting over in freeform chat."
+      }
+    ],
+    "learningItems": [
+      {
+        "id": "learning-custom-skills",
+        "summary": "Learning how to create custom Claude skills (via claude.ai)",
+        "status": "open",
+        "firstSeen": "2026-07-06",
+        "note": "No concrete takeaway reported yet."
+      },
+      {
+        "id": "learning-settings-improvements",
+        "summary": "Learning how to improve Claude settings/configuration (via claude.ai)",
+        "status": "open",
+        "firstSeen": "2026-07-06",
+        "note": "No concrete takeaway reported yet."
+      },
+      {
+        "id": "learning-github-version-control",
+        "summary": "GitHub / version control fundamentals",
+        "status": "open",
+        "firstSeen": "2026-07-07",
+        "note": "Started with the Portfolio HQ build — first real repo/push/deploy workflow."
+      },
+      {
+        "id": "learning-ai-code-review",
+        "summary": "Code review — reading and evaluating AI-generated code",
+        "status": "open",
+        "firstSeen": "2026-07-07",
+        "note": "Needed across SCDP, Portfolio HQ, and Neon Dreamhouse AI as AI writes more of the actual code."
+      }
+    ]
+  },
+  "proposedActions": [
+    {
+      "id": "rotate-supabase-credentials",
+      "summary": "Rotate the Supabase access token and DB password",
+      "status": "open",
+      "firstSeen": "2026-07-03",
+      "note": "Deferred until SCDP finishes its remaining build steps in Lovable, per prior decision.",
+      "flag": "Deferred"
+    }
+  ]
+}

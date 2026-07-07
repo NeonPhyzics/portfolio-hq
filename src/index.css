@@ -1,0 +1,54 @@
+:root {
+  --bg: #0a0a0f;
+  --bg-panel: #12121a;
+  --bg-card: #16161f;
+  --border: #26263a;
+  --ink: #eaeaf5;
+  --ink-soft: #8d8da8;
+  --ink-faint: #55556e;
+
+  --neon-cyan: #2de2e6;
+  --neon-magenta: #ff2fa0;
+  --neon-violet: #8b5cf6;
+  --neon-lime: #baff29;
+  --neon-amber: #ffb020;
+
+  --active-glow: rgba(45, 226, 230, 0.15);
+  --building-glow: rgba(255, 176, 32, 0.15);
+  --deferred-glow: rgba(141, 141, 168, 0.12);
+
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top left, #14141f 0%, var(--bg) 55%);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--neon-magenta);
+  color: #0a0a0f;
+}
+
+code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  background: rgba(255,255,255,0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--neon-cyan);
+}
