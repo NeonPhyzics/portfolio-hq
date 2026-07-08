@@ -41,16 +41,43 @@ function PriorityBadge({ priority }) {
   return <span className={`badge ${cls}`}>{priority}</span>
 }
 
-function TaskRow({ task, onDone }) {
+const PRIORITY_OPTIONS = ['urgent', 'high', 'medium', 'low']
+
+function TaskRow({ task, onDone, onPriorityChange, onDueDateChange, parentLabel }) {
   return (
-    <div className="task-row">
+    <div className={`task-row ${task.isBlocked ? 'task-blocked' : ''}`}>
       <button className="task-check" onClick={() => onDone(task.id)} aria-label="Mark done" />
       <div className="task-row-main">
         <span className="task-title">{task.title}</span>
+        {parentLabel && <span className="task-parent">{parentLabel}</span>}
         <div className="task-meta">
-          <PriorityBadge priority={task.priority} />
-          {task.due_date && <span className="task-due">due {task.due_date}</span>}
+          {onPriorityChange ? (
+            <select
+              className={`priority-select ${PRIORITY_CLASS[task.priority] || 'priority-medium'}`}
+              value={task.priority}
+              onChange={(e) => onPriorityChange(task.id, e.target.value)}
+            >
+              {PRIORITY_OPTIONS.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <PriorityBadge priority={task.priority} />
+          )}
+          {onDueDateChange ? (
+            <input
+              type="date"
+              className="due-input"
+              value={task.due_date || ''}
+              onChange={(e) => onDueDateChange(task.id, e.target.value)}
+            />
+          ) : (
+            task.due_date && <span className="task-due">due {task.due_date}</span>
+          )}
         </div>
+        {task.isBlocked && <span className="task-blocked-note">Blocked by: {task.blockerTitle}</span>}
       </div>
     </div>
   )
@@ -119,7 +146,7 @@ function ActiveProjectsView({ data }) {
   )
 }
 
-function LearningThreadCard({ thread, tasks, onDone, onClose, closed }) {
+function LearningThreadCard({ thread, tasks, onDone, onPriorityChange, onDueDateChange, onClose, closed }) {
   const [nextAction, ...backlog] = tasks
 
   return (
@@ -139,7 +166,9 @@ function LearningThreadCard({ thread, tasks, onDone, onClose, closed }) {
 
       {thread.build && <p className="lt-build">{thread.build}</p>}
 
-      {!closed && nextAction && <TaskRow task={nextAction} onDone={onDone} />}
+      {!closed && nextAction && (
+        <TaskRow task={nextAction} onDone={onDone} onPriorityChange={onPriorityChange} onDueDateChange={onDueDateChange} />
+      )}
       {!closed && !nextAction && <div className="lt-next-action">No open tasks.</div>}
 
       <div className="lt-donewhen">
@@ -152,7 +181,13 @@ function LearningThreadCard({ thread, tasks, onDone, onClose, closed }) {
           <summary>Backlog ({backlog.length})</summary>
           <div className="list backlog-list">
             {backlog.map((t) => (
-              <TaskRow key={t.id} task={t} onDone={onDone} />
+              <TaskRow
+                key={t.id}
+                task={t}
+                onDone={onDone}
+                onPriorityChange={onPriorityChange}
+                onDueDateChange={onDueDateChange}
+              />
             ))}
           </div>
         </details>
@@ -200,7 +235,9 @@ function SkillsView({ data }) {
               key={t.id}
               thread={t}
               tasks={data.tasksForThread(t.id)}
-              onDone={data.setTaskStatus ? (id) => data.setTaskStatus(id, 'done') : undefined}
+              onDone={(id) => data.setTaskStatus(id, 'done')}
+              onPriorityChange={data.setTaskPriority}
+              onDueDateChange={data.setTaskDueDate}
               onClose={data.closeThread}
             />
           ))}
@@ -258,19 +295,13 @@ function TodayView({ data }) {
     <div className="list">
       {tasks.map((t) => (
         <div className="row-card" key={t.id}>
-          <div className="row-top">
-            <h3>{t.title}</h3>
-            <PriorityBadge priority={t.priority} />
-          </div>
-          <div className="tags">
-            <span className="tag venture-tag">{parentLabel(t) || 'Unlinked'}</span>
-            {t.due_date && <span className="tag venture-tag cross">due {t.due_date}</span>}
-          </div>
-          <div className="lt-actions">
-            <button className="lt-btn lt-btn-complete" onClick={() => data.setTaskStatus(t.id, 'done')}>
-              Mark done
-            </button>
-          </div>
+          <TaskRow
+            task={t}
+            onDone={(id) => data.setTaskStatus(id, 'done')}
+            onPriorityChange={data.setTaskPriority}
+            onDueDateChange={data.setTaskDueDate}
+            parentLabel={parentLabel(t) || 'Unlinked'}
+          />
         </div>
       ))}
     </div>

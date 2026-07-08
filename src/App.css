@@ -465,11 +465,51 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .task-due {
   font-size: 11px;
   color: var(--ink-faint);
+}
+
+.task-parent {
+  font-size: 11px;
+  color: var(--neon-violet);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.priority-select {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background-color: var(--bg-card);
+}
+
+.due-input {
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 6px;
+  color-scheme: dark;
+}
+
+.task-row.task-blocked .task-title {
+  color: var(--ink-soft);
+}
+
+.task-blocked-note {
+  font-size: 11px;
+  color: var(--neon-amber);
+  margin-top: 2px;
 }
 
 .backlog-list .task-row {

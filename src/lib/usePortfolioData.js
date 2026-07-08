@@ -5,6 +5,9 @@ const PRIORITY_RANK = { urgent: 0, high: 1, medium: 2, low: 3 }
 
 function sortTasks(tasks) {
   return [...tasks].sort((a, b) => {
+    // Blocked tasks always sort after ready ones, regardless of priority —
+    // there's no point surfacing something as "next" that can't be started.
+    if (a.isBlocked !== b.isBlocked) return a.isBlocked ? 1 : -1
     const p = PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]
     if (p !== 0) return p
     const ad = a.due_date ? new Date(a.due_date).getTime() : Infinity
@@ -20,7 +23,7 @@ export function usePortfolioData(session) {
   const [ventures, setVentures] = useState([])
   const [projects, setProjects] = useState([])
   const [learningThreads, setLearningThreads] = useState([])
-  const [tasks, setTasks] = useState([])
+  const [rawTasks, setRawTasks] = useState([])
   const [nudges, setNudges] = useState([])
 
   const refetch = useCallback(async () => {
@@ -43,7 +46,7 @@ export function usePortfolioData(session) {
     setVentures(v.data)
     setProjects(p.data)
     setLearningThreads(lt.data)
-    setTasks(t.data)
+    setRawTasks(t.data)
     setNudges(n.data)
     setLoading(false)
   }, [session])
@@ -52,20 +55,41 @@ export function usePortfolioData(session) {
     refetch()
   }, [refetch])
 
+  const tasksById = new Map(rawTasks.map((t) => [t.id, t]))
+
+  // Enrich each task with whether it's currently blocked, and by what,
+  // so views don't need to re-derive this themselves.
+  const tasks = rawTasks.map((t) => {
+    const blocker = t.blocked_by ? tasksById.get(t.blocked_by) : null
+    const isBlocked = !!blocker && blocker.status !== 'done'
+    return { ...t, isBlocked, blockerTitle: isBlocked ? blocker.title : null }
+  })
+
   const openTasks = tasks.filter((t) => t.status !== 'done')
 
   function tasksFor(key, id) {
     return sortTasks(openTasks.filter((t) => t[key] === id))
   }
 
-  async function setTaskStatus(id, status) {
-    const patch = { status, completed_at: status === 'done' ? new Date().toISOString() : null }
-    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)))
+  async function patchTask(id, patch) {
+    setRawTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)))
     const { error } = await supabase.from('tasks').update(patch).eq('id', id)
     if (error) {
       setError(error)
       refetch()
     }
+  }
+
+  async function setTaskStatus(id, status) {
+    await patchTask(id, { status, completed_at: status === 'done' ? new Date().toISOString() : null })
+  }
+
+  async function setTaskPriority(id, priority) {
+    await patchTask(id, { priority })
+  }
+
+  async function setTaskDueDate(id, due_date) {
+    await patchTask(id, { due_date: due_date || null })
   }
 
   async function closeThread(id) {
@@ -91,6 +115,8 @@ export function usePortfolioData(session) {
     tasksForThread: (id) => tasksFor('learning_thread_id', id),
     allOpenSorted: sortTasks(openTasks),
     setTaskStatus,
+    setTaskPriority,
+    setTaskDueDate,
     closeThread,
     refetch,
   }
