@@ -1,0 +1,16 @@
+{
+  "name": "Portfolio HQ",
+  "short_name": "Portfolio HQ",
+  "description": "System of record for every venture, project, and skill in flight.",
+  "start_url": "/portfolio-hq/",
+  "scope": "/portfolio-hq/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    { "src": "/portfolio-hq/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/portfolio-hq/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/portfolio-hq/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/portfolio-hq/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

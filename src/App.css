@@ -398,6 +398,179 @@
   opacity: 0.55;
 }
 
+/* Priority badges */
+.priority-urgent {
+  color: var(--neon-magenta);
+  background: rgba(255, 47, 160, 0.15);
+  border-color: rgba(255, 47, 160, 0.35);
+}
+
+.priority-high {
+  color: var(--neon-amber);
+  background: var(--building-glow);
+  border-color: rgba(255, 176, 32, 0.35);
+}
+
+.priority-medium {
+  color: var(--neon-cyan);
+  background: var(--active-glow);
+  border-color: rgba(45, 226, 230, 0.35);
+}
+
+.priority-low {
+  color: var(--ink-soft);
+  background: var(--deferred-glow);
+  border-color: var(--border);
+}
+
+/* Task rows */
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.task-check {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--neon-cyan);
+  background: transparent;
+  cursor: pointer;
+  margin-top: 2px;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.task-check:hover {
+  background: var(--active-glow);
+}
+
+.task-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.task-title {
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-due {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.backlog-list .task-row {
+  margin-bottom: 12px;
+}
+
+.backlog-list .task-title {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+/* Sign out */
+.signout-btn {
+  margin-top: 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink-faint);
+  font-size: 11.5px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.signout-btn:hover {
+  color: var(--ink-soft);
+  background: rgba(255,255,255,0.03);
+}
+
+/* Login screen */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.login-title {
+  margin: 0 0 24px;
+  font-size: 24px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.login-input {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--ink);
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+}
+
+.login-btn {
+  width: 100%;
+  background: var(--active-glow);
+  border: 1px solid rgba(45, 226, 230, 0.35);
+  color: var(--neon-cyan);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.login-sent {
+  color: var(--neon-lime);
+  font-size: 14px;
+}
+
+.login-error {
+  color: var(--neon-magenta);
+  font-size: 12.5px;
+  margin: 10px 0 0;
+}
+
 @media (max-width: 860px) {
   .app {
     flex-direction: column;
