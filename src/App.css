@@ -431,23 +431,6 @@
   margin-bottom: 14px;
 }
 
-.task-check {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid var(--neon-cyan);
-  background: transparent;
-  cursor: pointer;
-  margin-top: 2px;
-  padding: 0;
-  transition: all 0.15s ease;
-}
-
-.task-check:hover {
-  background: var(--active-glow);
-}
-
 .task-row-main {
   display: flex;
   flex-direction: column;
@@ -510,6 +493,80 @@
   font-size: 11px;
   color: var(--neon-amber);
   margin-top: 2px;
+}
+
+/* Status select (replaces the old done-checkbox) */
+.status-select {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: 1px solid transparent;
+  cursor: pointer;
+  margin-top: 1px;
+}
+
+.task-status-open {
+  color: var(--neon-cyan);
+  background: var(--active-glow);
+  border-color: rgba(45, 226, 230, 0.35);
+}
+
+.task-status-in-progress {
+  color: var(--neon-amber);
+  background: var(--building-glow);
+  border-color: rgba(255, 176, 32, 0.35);
+}
+
+.task-status-blocked-status {
+  color: var(--neon-magenta);
+  background: rgba(255, 47, 160, 0.15);
+  border-color: rgba(255, 47, 160, 0.35);
+}
+
+.task-status-done {
+  color: var(--ink-faint);
+  background: var(--deferred-glow);
+  border-color: var(--border);
+}
+
+/* Today view: group toggle + grouped sections */
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.toggle-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.toggle-btn.active {
+  color: var(--neon-cyan);
+  background: var(--active-glow);
+  border-color: rgba(45, 226, 230, 0.35);
+}
+
+.today-group {
+  margin-bottom: 28px;
+}
+
+.today-group-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--neon-violet);
+  margin: 0 0 12px;
 }
 
 .backlog-list .task-row {

@@ -42,11 +42,29 @@ function PriorityBadge({ priority }) {
 }
 
 const PRIORITY_OPTIONS = ['urgent', 'high', 'medium', 'low']
+const STATUS_OPTIONS = ['open', 'in_progress', 'blocked', 'done']
+const STATUS_SELECT_CLASS = {
+  open: 'task-status-open',
+  in_progress: 'task-status-in-progress',
+  blocked: 'task-status-blocked-status',
+  done: 'task-status-done',
+}
 
-function TaskRow({ task, onDone, onPriorityChange, onDueDateChange, parentLabel }) {
+function TaskRow({ task, onStatusChange, onPriorityChange, onDueDateChange, parentLabel }) {
   return (
     <div className={`task-row ${task.isBlocked ? 'task-blocked' : ''}`}>
-      <button className="task-check" onClick={() => onDone(task.id)} aria-label="Mark done" />
+      <select
+        className={`status-select ${STATUS_SELECT_CLASS[task.status] || 'task-status-open'}`}
+        value={task.status}
+        onChange={(e) => onStatusChange(task.id, e.target.value)}
+        aria-label="Task status"
+      >
+        {STATUS_OPTIONS.map((s) => (
+          <option key={s} value={s}>
+            {s.replace('_', ' ')}
+          </option>
+        ))}
+      </select>
       <div className="task-row-main">
         <span className="task-title">{task.title}</span>
         {parentLabel && <span className="task-parent">{parentLabel}</span>}
@@ -146,7 +164,7 @@ function ActiveProjectsView({ data }) {
   )
 }
 
-function LearningThreadCard({ thread, tasks, onDone, onPriorityChange, onDueDateChange, onClose, closed }) {
+function LearningThreadCard({ thread, tasks, onStatusChange, onPriorityChange, onDueDateChange, onClose, closed }) {
   const [nextAction, ...backlog] = tasks
 
   return (
@@ -167,7 +185,12 @@ function LearningThreadCard({ thread, tasks, onDone, onPriorityChange, onDueDate
       {thread.build && <p className="lt-build">{thread.build}</p>}
 
       {!closed && nextAction && (
-        <TaskRow task={nextAction} onDone={onDone} onPriorityChange={onPriorityChange} onDueDateChange={onDueDateChange} />
+        <TaskRow
+          task={nextAction}
+          onStatusChange={onStatusChange}
+          onPriorityChange={onPriorityChange}
+          onDueDateChange={onDueDateChange}
+        />
       )}
       {!closed && !nextAction && <div className="lt-next-action">No open tasks.</div>}
 
@@ -184,7 +207,7 @@ function LearningThreadCard({ thread, tasks, onDone, onPriorityChange, onDueDate
               <TaskRow
                 key={t.id}
                 task={t}
-                onDone={onDone}
+                onStatusChange={onStatusChange}
                 onPriorityChange={onPriorityChange}
                 onDueDateChange={onDueDateChange}
               />
@@ -235,7 +258,7 @@ function SkillsView({ data }) {
               key={t.id}
               thread={t}
               tasks={data.tasksForThread(t.id)}
-              onDone={(id) => data.setTaskStatus(id, 'done')}
+              onStatusChange={data.setTaskStatus}
               onPriorityChange={data.setTaskPriority}
               onDueDateChange={data.setTaskDueDate}
               onClose={data.closeThread}
@@ -278,6 +301,8 @@ function SkillsView({ data }) {
 }
 
 function TodayView({ data }) {
+  const [groupBy, setGroupBy] = useState('priority')
+
   function parentLabel(task) {
     if (task.venture_id) return data.ventures.find((v) => v.id === task.venture_id)?.name
     if (task.project_id) return data.projects.find((p) => p.id === task.project_id)?.name
@@ -291,20 +316,58 @@ function TodayView({ data }) {
     return <p className="proposals-note">Nothing open. Go build something.</p>
   }
 
+  function renderRow(t) {
+    return (
+      <div className="row-card" key={t.id}>
+        <TaskRow
+          task={t}
+          onStatusChange={data.setTaskStatus}
+          onPriorityChange={data.setTaskPriority}
+          onDueDateChange={data.setTaskDueDate}
+          parentLabel={parentLabel(t) || 'Unlinked'}
+        />
+      </div>
+    )
+  }
+
+  let body
+  if (groupBy === 'priority') {
+    body = <div className="list">{tasks.map(renderRow)}</div>
+  } else {
+    // Group by venture/project/thread, preserving each task's priority-sorted
+    // position within its group (a lightweight work-breakdown view).
+    const groups = new Map()
+    for (const t of tasks) {
+      const key = parentLabel(t) || 'Unlinked'
+      if (!groups.has(key)) groups.set(key, [])
+      groups.get(key).push(t)
+    }
+    body = [...groups.entries()].map(([label, groupTasks]) => (
+      <section key={label} className="today-group">
+        <h2 className="today-group-title">{label}</h2>
+        <div className="list">{groupTasks.map(renderRow)}</div>
+      </section>
+    ))
+  }
+
   return (
-    <div className="list">
-      {tasks.map((t) => (
-        <div className="row-card" key={t.id}>
-          <TaskRow
-            task={t}
-            onDone={(id) => data.setTaskStatus(id, 'done')}
-            onPriorityChange={data.setTaskPriority}
-            onDueDateChange={data.setTaskDueDate}
-            parentLabel={parentLabel(t) || 'Unlinked'}
-          />
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="view-toggle">
+        <button
+          className={`toggle-btn ${groupBy === 'priority' ? 'active' : ''}`}
+          onClick={() => setGroupBy('priority')}
+        >
+          By priority
+        </button>
+        <button
+          className={`toggle-btn ${groupBy === 'parent' ? 'active' : ''}`}
+          onClick={() => setGroupBy('parent')}
+        >
+          By venture/project
+        </button>
+      </div>
+      {body}
+    </>
   )
 }
 
