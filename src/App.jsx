@@ -4,45 +4,27 @@ import { useAuth } from './lib/useAuth'
 import { usePortfolioData } from './lib/usePortfolioData'
 import './App.css'
 
-const TABS = ['Today', 'Ventures', 'Active Projects', 'Skills']
+const TABS = ['Monday Review', 'By Band', 'By Domain']
 
-const STATUS_CLASS = {
-  Active: 'status-active',
-  Building: 'status-building',
-  'In progress': 'status-active',
-  Deferred: 'status-deferred',
+const BAND_LABEL = {
+  1: 'Core Business',
+  2: 'Business Tools',
+  3: 'Tools + Learning',
+  4: 'Hobbies',
 }
 
-const PRIORITY_CLASS = {
+const URGENCY_OPTIONS = ['urgent', 'high', 'medium', 'low']
+const STATUS_OPTIONS = ['open', 'in_progress', 'blocked', 'done']
+const BAND_OPTIONS = [1, 2, 3, 4]
+const DOMAIN_OPTIONS = ['Business', 'Household']
+
+const URGENCY_CLASS = {
   urgent: 'priority-urgent',
   high: 'priority-high',
   medium: 'priority-medium',
   low: 'priority-low',
 }
 
-// Static housekeeping proposals — not yet migrated into the tasks table,
-// since these are rare one-off items rather than recurring task/venture work.
-const PROPOSED_ACTIONS = [
-  {
-    id: 'rotate-supabase-credentials',
-    summary: 'Rotate the SCDP Supabase access token and DB password',
-    note: 'Deferred until SCDP finishes its remaining build steps in Lovable, per prior decision.',
-    flag: 'Deferred',
-  },
-]
-
-function StatusBadge({ status }) {
-  const cls = STATUS_CLASS[status] || 'status-deferred'
-  return <span className={`badge ${cls}`}>{status}</span>
-}
-
-function PriorityBadge({ priority }) {
-  const cls = PRIORITY_CLASS[priority] || 'priority-medium'
-  return <span className={`badge ${cls}`}>{priority}</span>
-}
-
-const PRIORITY_OPTIONS = ['urgent', 'high', 'medium', 'low']
-const STATUS_OPTIONS = ['open', 'in_progress', 'blocked', 'done']
 const STATUS_SELECT_CLASS = {
   open: 'task-status-open',
   in_progress: 'task-status-in-progress',
@@ -50,344 +32,256 @@ const STATUS_SELECT_CLASS = {
   done: 'task-status-done',
 }
 
-function TaskRow({ task, onStatusChange, onPriorityChange, onDueDateChange, parentLabel }) {
-  return (
-    <div className={`task-row ${task.isBlocked ? 'task-blocked' : ''}`}>
-      <select
-        className={`status-select ${STATUS_SELECT_CLASS[task.status] || 'task-status-open'}`}
-        value={task.status}
-        onChange={(e) => onStatusChange(task.id, e.target.value)}
-        aria-label="Task status"
-      >
-        {STATUS_OPTIONS.map((s) => (
-          <option key={s} value={s}>
-            {s.replace('_', ' ')}
-          </option>
-        ))}
-      </select>
-      <div className="task-row-main">
-        <span className="task-title">{task.title}</span>
-        {parentLabel && <span className="task-parent">{parentLabel}</span>}
-        <div className="task-meta">
-          {onPriorityChange ? (
-            <select
-              className={`priority-select ${PRIORITY_CLASS[task.priority] || 'priority-medium'}`}
-              value={task.priority}
-              onChange={(e) => onPriorityChange(task.id, e.target.value)}
-            >
-              {PRIORITY_OPTIONS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <PriorityBadge priority={task.priority} />
-          )}
-          {onDueDateChange ? (
-            <input
-              type="date"
-              className="due-input"
-              value={task.due_date || ''}
-              onChange={(e) => onDueDateChange(task.id, e.target.value)}
-            />
-          ) : (
-            task.due_date && <span className="task-due">due {task.due_date}</span>
-          )}
-        </div>
-        {task.isBlocked && <span className="task-blocked-note">Blocked by: {task.blockerTitle}</span>}
-      </div>
-    </div>
-  )
-}
-
-function VenturesView({ data }) {
-  return (
-    <div className="grid">
-      {data.ventures.map((v) => {
-        const next = data.tasksForVenture(v.id)[0]
-        return (
-          <div className="card venture-card" key={v.id}>
-            <div className="card-top">
-              <h3>{v.name}</h3>
-              <StatusBadge status={v.status} />
-            </div>
-            <p className="summary">{v.summary}</p>
-            <div className="field">
-              <div className="label">Focus</div>
-              <div className="value">{v.focus}</div>
-            </div>
-            <div className="field next">
-              <div className="label">Next</div>
-              <div className="value">{next ? next.title : 'None open.'}</div>
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function ActiveProjectsView({ data }) {
-  return (
-    <div className="list">
-      {data.projects.map((p) => {
-        const venture = data.ventures.find((v) => v.id === p.venture_id)
-        const next = data.tasksForProject(p.id)[0]
-        return (
-          <div className="row-card" key={p.id}>
-            <div className="row-top">
-              <h3>{p.name}</h3>
-              <StatusBadge status={p.status} />
-            </div>
-            <div className="tags">
-              {venture ? (
-                <span className="tag venture-tag">{venture.name}</span>
-              ) : (
-                <span className="tag venture-tag cross">Cross-venture</span>
-              )}
-            </div>
-            {p.blocker && (
-              <div className="field">
-                <div className="label">Blocker</div>
-                <div className="value blocker">{p.blocker}</div>
-              </div>
-            )}
-            <div className="field next">
-              <div className="label">Next</div>
-              <div className="value">{next ? next.title : 'None open.'}</div>
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-function LearningThreadCard({ thread, tasks, onStatusChange, onPriorityChange, onDueDateChange, onClose, closed }) {
-  const [nextAction, ...backlog] = tasks
+function TaskRow({ task, onUpdate, onStatusChange, onDelete }) {
+  const [notesOpen, setNotesOpen] = useState(false)
 
   return (
-    <div className={`row-card lt-card ${closed ? 'lt-closed' : ''}`}>
-      <div className="lt-header">
-        <div>
-          <h3>{thread.title}</h3>
-          <span className="tag lt-project-tag">{thread.linked_label}</span>
-        </div>
-        <div className="lt-meta">
-          <span className={`badge ${thread.status === 'open' ? 'status-active' : 'status-deferred'}`}>
-            {thread.status}
-          </span>
-          <span className="lt-since">since {thread.since}</span>
-        </div>
+    <div className={`row-card task-row-card ${task.isBlocked ? 'task-blocked' : ''}`}>
+      <div className="row-top">
+        <select
+          className={`status-select ${STATUS_SELECT_CLASS[task.status] || 'task-status-open'}`}
+          value={task.status}
+          onChange={(e) => onStatusChange(task.id, e.target.value)}
+          aria-label="Task status"
+        >
+          {STATUS_OPTIONS.map((s) => (
+            <option key={s} value={s}>
+              {s.replace('_', ' ')}
+            </option>
+          ))}
+        </select>
+        <h3 className="task-row-title">{task.title}</h3>
+        <button className="delete-btn" onClick={() => onDelete(task.id)} aria-label="Delete task">
+          ×
+        </button>
       </div>
 
-      {thread.build && <p className="lt-build">{thread.build}</p>}
+      {task.isBlocked && <span className="task-blocked-note">Blocked by: {task.blockerTitle}</span>}
 
-      {!closed && nextAction && (
-        <TaskRow
-          task={nextAction}
-          onStatusChange={onStatusChange}
-          onPriorityChange={onPriorityChange}
-          onDueDateChange={onDueDateChange}
+      <div className="task-meta">
+        <select
+          className={`priority-select ${URGENCY_CLASS[task.urgency] || 'priority-medium'}`}
+          value={task.urgency}
+          onChange={(e) => onUpdate(task.id, { urgency: e.target.value })}
+        >
+          {URGENCY_OPTIONS.map((u) => (
+            <option key={u} value={u}>
+              {u}
+            </option>
+          ))}
+        </select>
+        <select
+          className="band-select"
+          value={task.band}
+          onChange={(e) => onUpdate(task.id, { band: Number(e.target.value) })}
+        >
+          {BAND_OPTIONS.map((b) => (
+            <option key={b} value={b}>
+              Band {b} — {BAND_LABEL[b]}
+            </option>
+          ))}
+        </select>
+        <select
+          className="domain-select"
+          value={task.domain}
+          onChange={(e) => onUpdate(task.id, { domain: e.target.value })}
+        >
+          {DOMAIN_OPTIONS.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+        <input
+          type="date"
+          className="due-input"
+          value={task.due_date || ''}
+          onChange={(e) => onUpdate(task.id, { due_date: e.target.value || null })}
         />
-      )}
-      {!closed && !nextAction && <div className="lt-next-action">No open tasks.</div>}
-
-      <div className="lt-donewhen">
-        <span className="lt-donewhen-label">Done when</span>
-        {thread.done_when}
       </div>
 
-      {backlog.length > 0 && (
-        <details className="lt-backlog">
-          <summary>Backlog ({backlog.length})</summary>
-          <div className="list backlog-list">
-            {backlog.map((t) => (
-              <TaskRow
-                key={t.id}
-                task={t}
-                onStatusChange={onStatusChange}
-                onPriorityChange={onPriorityChange}
-                onDueDateChange={onDueDateChange}
-              />
-            ))}
-          </div>
-        </details>
-      )}
+      {task.venture && <span className="tag venture-tag">{task.venture}</span>}
 
-      {thread.note && (
-        <div className="field next">
-          <div className="label">Note</div>
-          <div className="value">{thread.note}</div>
-        </div>
-      )}
-
-      {!closed && (
-        <div className="lt-actions">
-          <button className="lt-btn lt-btn-close" onClick={() => onClose(thread.id)}>
-            Close thread
-          </button>
-        </div>
-      )}
+      <details className="notes-toggle" open={notesOpen} onToggle={(e) => setNotesOpen(e.target.open)}>
+        <summary>{task.notes ? 'Notes' : 'Add notes'}</summary>
+        <textarea
+          className="notes-input"
+          defaultValue={task.notes || ''}
+          onBlur={(e) => onUpdate(task.id, { notes: e.target.value || null })}
+          rows={2}
+        />
+      </details>
     </div>
   )
 }
 
-function SkillsView({ data }) {
-  const open = data.learningThreads.filter((t) => t.status === 'open')
-  const closed = data.learningThreads.filter((t) => t.status === 'closed')
+function NewTaskForm({ onCreate }) {
+  const [open, setOpen] = useState(false)
+  const [title, setTitle] = useState('')
+  const [band, setBand] = useState(1)
+  const [domain, setDomain] = useState('Business')
+  const [urgency, setUrgency] = useState('medium')
+  const [dueDate, setDueDate] = useState('')
+
+  function submit(e) {
+    e.preventDefault()
+    if (!title.trim()) return
+    onCreate({ title: title.trim(), band, domain, urgency, due_date: dueDate || null })
+    setTitle('')
+    setBand(1)
+    setDomain('Business')
+    setUrgency('medium')
+    setDueDate('')
+    setOpen(false)
+  }
+
+  if (!open) {
+    return (
+      <button className="toggle-btn new-task-btn" onClick={() => setOpen(true)}>
+        + New task
+      </button>
+    )
+  }
+
+  return (
+    <form className="new-task-form" onSubmit={submit}>
+      <input
+        type="text"
+        placeholder="Task title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        autoFocus
+        className="login-input"
+      />
+      <div className="task-meta">
+        <select className="priority-select" value={urgency} onChange={(e) => setUrgency(e.target.value)}>
+          {URGENCY_OPTIONS.map((u) => (
+            <option key={u} value={u}>
+              {u}
+            </option>
+          ))}
+        </select>
+        <select className="band-select" value={band} onChange={(e) => setBand(Number(e.target.value))}>
+          {BAND_OPTIONS.map((b) => (
+            <option key={b} value={b}>
+              Band {b} — {BAND_LABEL[b]}
+            </option>
+          ))}
+        </select>
+        <select className="domain-select" value={domain} onChange={(e) => setDomain(e.target.value)}>
+          {DOMAIN_OPTIONS.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+        <input type="date" className="due-input" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+      </div>
+      <div className="lt-actions">
+        <button type="submit" className="lt-btn lt-btn-complete">
+          Add
+        </button>
+        <button type="button" className="lt-btn lt-btn-close" onClick={() => setOpen(false)}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  )
+}
+
+function MondayReviewView({ data }) {
+  const groups = new Map()
+  for (const t of data.openTasks) {
+    if (!groups.has(t.band)) groups.set(t.band, [])
+    groups.get(t.band).push(t)
+  }
 
   return (
     <>
-      <section className="skills-section">
-        <h2>Today's 1% Better</h2>
-        {data.nudges.map((n) => (
-          <div className="nudge" key={n.id}>
-            <span className="tag nudge-tag">{n.tag}</span>
-            <p>{n.text}</p>
+      <NewTaskForm onCreate={data.createTask} />
+      {[...groups.entries()].map(([band, tasks]) => (
+        <section key={band} className="today-group">
+          <h2 className="today-group-title">
+            Band {band} — {BAND_LABEL[band]}
+          </h2>
+          <div className="list">
+            {tasks.map((t) => (
+              <TaskRow key={t.id} task={t} onUpdate={data.updateTask} onStatusChange={data.setTaskStatus} onDelete={data.deleteTask} />
+            ))}
           </div>
-        ))}
-      </section>
-
-      <section className="skills-section">
-        <h2>Learning Threads</h2>
-        <div className="list">
-          {open.map((t) => (
-            <LearningThreadCard
-              key={t.id}
-              thread={t}
-              tasks={data.tasksForThread(t.id)}
-              onStatusChange={data.setTaskStatus}
-              onPriorityChange={data.setTaskPriority}
-              onDueDateChange={data.setTaskDueDate}
-              onClose={data.closeThread}
-            />
-          ))}
-        </div>
-
-        {closed.length > 0 && (
-          <details className="lt-closed-group">
-            <summary>Closed ({closed.length})</summary>
-            <div className="list">
-              {closed.map((t) => (
-                <LearningThreadCard key={t.id} thread={t} tasks={data.tasksForThread(t.id)} closed />
-              ))}
-            </div>
-          </details>
-        )}
-      </section>
-
-      <section className="skills-section">
-        <h2>Proposed Actions</h2>
-        <p className="proposals-note">Proposals only — nothing here has been run automatically.</p>
-        <div className="list">
-          {PROPOSED_ACTIONS.map((a) => (
-            <div className="row-card" key={a.id}>
-              <div className="row-top">
-                <h3>{a.summary}</h3>
-                {a.flag && <span className="badge status-deferred">{a.flag}</span>}
-              </div>
-              <div className="field next">
-                <div className="label">Why</div>
-                <div className="value">{a.note}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+        </section>
+      ))}
     </>
   )
 }
 
-function TodayView({ data }) {
-  const [groupBy, setGroupBy] = useState('priority')
-
-  function parentLabel(task) {
-    if (task.venture_id) return data.ventures.find((v) => v.id === task.venture_id)?.name
-    if (task.project_id) return data.projects.find((p) => p.id === task.project_id)?.name
-    if (task.learning_thread_id) return data.learningThreads.find((t) => t.id === task.learning_thread_id)?.title
-    return null
-  }
-
-  const tasks = data.allOpenSorted
-
-  if (tasks.length === 0) {
-    return <p className="proposals-note">Nothing open. Go build something.</p>
-  }
-
-  function renderRow(t) {
-    return (
-      <div className="row-card" key={t.id}>
-        <TaskRow
-          task={t}
-          onStatusChange={data.setTaskStatus}
-          onPriorityChange={data.setTaskPriority}
-          onDueDateChange={data.setTaskDueDate}
-          parentLabel={parentLabel(t) || 'Unlinked'}
-        />
-      </div>
-    )
-  }
-
-  let body
-  if (groupBy === 'priority') {
-    body = <div className="list">{tasks.map(renderRow)}</div>
-  } else {
-    // Group by venture/project/thread, preserving each task's priority-sorted
-    // position within its group (a lightweight work-breakdown view).
-    const groups = new Map()
-    for (const t of tasks) {
-      const key = parentLabel(t) || 'Unlinked'
-      if (!groups.has(key)) groups.set(key, [])
-      groups.get(key).push(t)
-    }
-    body = [...groups.entries()].map(([label, groupTasks]) => (
-      <section key={label} className="today-group">
-        <h2 className="today-group-title">{label}</h2>
-        <div className="list">{groupTasks.map(renderRow)}</div>
-      </section>
-    ))
-  }
+function ByBandView({ data }) {
+  const [band, setBand] = useState(1)
+  const tasks = data.openTasks.filter((t) => t.band === band)
 
   return (
     <>
+      <NewTaskForm onCreate={data.createTask} />
       <div className="view-toggle">
-        <button
-          className={`toggle-btn ${groupBy === 'priority' ? 'active' : ''}`}
-          onClick={() => setGroupBy('priority')}
-        >
-          By priority
-        </button>
-        <button
-          className={`toggle-btn ${groupBy === 'parent' ? 'active' : ''}`}
-          onClick={() => setGroupBy('parent')}
-        >
-          By venture/project
-        </button>
+        {BAND_OPTIONS.map((b) => (
+          <button key={b} className={`toggle-btn ${band === b ? 'active' : ''}`} onClick={() => setBand(b)}>
+            Band {b}
+          </button>
+        ))}
       </div>
-      {body}
+      {tasks.length === 0 ? (
+        <p className="proposals-note">Nothing open in Band {band}.</p>
+      ) : (
+        <div className="list">
+          {tasks.map((t) => (
+            <TaskRow key={t.id} task={t} onUpdate={data.updateTask} onStatusChange={data.setTaskStatus} onDelete={data.deleteTask} />
+          ))}
+        </div>
+      )}
+    </>
+  )
+}
+
+function ByDomainView({ data }) {
+  const [domain, setDomain] = useState('Business')
+  const tasks = data.openTasks.filter((t) => t.domain === domain)
+
+  return (
+    <>
+      <NewTaskForm onCreate={data.createTask} />
+      <div className="view-toggle">
+        {DOMAIN_OPTIONS.map((d) => (
+          <button key={d} className={`toggle-btn ${domain === d ? 'active' : ''}`} onClick={() => setDomain(d)}>
+            {d}
+          </button>
+        ))}
+      </div>
+      {tasks.length === 0 ? (
+        <p className="proposals-note">Nothing open in {domain}.</p>
+      ) : (
+        <div className="list">
+          {tasks.map((t) => (
+            <TaskRow key={t.id} task={t} onUpdate={data.updateTask} onStatusChange={data.setTaskStatus} onDelete={data.deleteTask} />
+          ))}
+        </div>
+      )}
     </>
   )
 }
 
 function AppShell({ data, onSignOut }) {
-  const [tab, setTab] = useState('Today')
+  const [tab, setTab] = useState('Monday Review')
 
   return (
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
           <h1>Portfolio HQ</h1>
-          <p className="tagline">System of record for every venture, project, and skill in flight.</p>
+          <p className="tagline">Personal task management for a multi-venture portfolio.</p>
         </div>
         <nav className="tabs">
           {TABS.map((t) => (
-            <button
-              key={t}
-              className={`tab-btn ${tab === t ? 'active' : ''}`}
-              onClick={() => setTab(t)}
-            >
+            <button key={t} className={`tab-btn ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
               {t}
             </button>
           ))}
@@ -403,11 +297,7 @@ function AppShell({ data, onSignOut }) {
         </div>
         <nav className="tabs mobile-tabs">
           {TABS.map((t) => (
-            <button
-              key={t}
-              className={`tab-btn ${tab === t ? 'active' : ''}`}
-              onClick={() => setTab(t)}
-            >
+            <button key={t} className={`tab-btn ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
               {t}
             </button>
           ))}
@@ -418,10 +308,9 @@ function AppShell({ data, onSignOut }) {
 
         {!data.loading && !data.error && (
           <>
-            {tab === 'Today' && <TodayView data={data} />}
-            {tab === 'Ventures' && <VenturesView data={data} />}
-            {tab === 'Active Projects' && <ActiveProjectsView data={data} />}
-            {tab === 'Skills' && <SkillsView data={data} />}
+            {tab === 'Monday Review' && <MondayReviewView data={data} />}
+            {tab === 'By Band' && <ByBandView data={data} />}
+            {tab === 'By Domain' && <ByDomainView data={data} />}
           </>
         )}
       </main>
