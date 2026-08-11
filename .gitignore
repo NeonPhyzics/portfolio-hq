@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Per-project Supabase CLI DB password (scripts/sb.ps1) -- never committed
+.supabase-db-password
+!.supabase-db-password.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
