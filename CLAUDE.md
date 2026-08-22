@@ -6,14 +6,19 @@ vehicle for Git, Supabase, and Claude Code. The tool must ship; the learning
 is a byproduct, not a license for scope creep.
 
 ## MVP — done_when (this defines "pencils down")
-- [ ] Tasks CRUD backed by Supabase
-- [ ] Every task has: title, notes, band (1-4), domain (Business | Household),
+- [x] Tasks CRUD backed by Supabase
+- [x] Every task has: title, notes, band (1-4), domain (Business | Household),
       urgency, status, due date (optional)
-- [ ] Default sort: band ascending, then urgency. Band always sorts first.
-- [ ] Filtered views: by band, by domain, and a combined "Monday review" view
+- [x] Default sort: band ascending, then urgency. Band always sorts first.
+- [x] Filtered views: by band, by domain, and a combined "Monday review" view
       showing open Band 1 tasks first
-- [ ] Installable/usable as a PWA on mobile
-- [ ] Existing task data migrated in
+- [x] Installable/usable as a PWA on mobile
+- [x] Existing task data migrated in
+
+MVP shipped 2026-08-20 (confirmed). Calendar and Exit Ready HR CRM are approved
+next builds, scoped into this app rather than PLAYGROUND.md — see MVP.md for
+the next punch list. Post-MVP: main stays stable, experiments on feature
+branches (see Working rules).
 
 ## Band taxonomy (fixed — do not add bands)
 1 = Core Business (Exit Ready HR: pipeline, offers, delivery)

@@ -27,3 +27,12 @@ deleted from the database either — see CLAUDE.md working rules.
   Projects tabs (venture summary cards, "next action" derivation). Being
   dropped from MVP nav in favor of Band/Domain views; the underlying
   `ventures`/`projects` tables aren't deleted, just unused by the UI.
+- **Auth email redirect goes to Supabase instead of the app** — sign-up/
+  magic-link emails redirect to a Supabase URL instead of back to the app.
+  `src/lib/useAuth.js` already sets `emailRedirectTo` correctly to
+  `window.location.origin + pathname`; the likely cause is Supabase's Auth
+  "Redirect URLs" allowlist not including localhost/prod URLs, causing a
+  silent fallback. Supabase is the right call here — data needs to be
+  dynamic across devices — so this is a config fix, not an architecture
+  change. Fix: add the app's URLs to Supabase Auth → URL Configuration →
+  Redirect URLs.
