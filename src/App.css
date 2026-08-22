@@ -511,6 +511,42 @@
   margin-bottom: 0;
 }
 
+/* HQ sub-tabs (Monday Review / By Band / By Domain) */
+.hq-subtabs {
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+/* CRM landing */
+.crm-header {
+  margin-bottom: 24px;
+}
+
+.crm-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: var(--ink);
+}
+
+.crm-area-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.crm-area-card h3 {
+  margin: 0 0 6px;
+}
+
+.crm-planned-tag {
+  display: inline-block;
+  margin-top: 4px;
+  color: var(--ink-faint);
+  background: var(--deferred-glow);
+}
+
 @media (max-width: 860px) {
   .app {
     flex-direction: column;

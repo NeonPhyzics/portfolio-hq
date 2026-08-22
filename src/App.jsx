@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import Login from './components/Login.jsx'
 import { useAuth } from './lib/useAuth'
 import { usePortfolioData } from './lib/usePortfolioData'
+import CrmLanding from './features/crm/CrmLanding.jsx'
 import './App.css'
 
-const TABS = ['Monday Review', 'By Band', 'By Domain']
+const HQ_TABS = ['Monday Review', 'By Band', 'By Domain']
 
 const BAND_LABEL = {
   1: 'Core Business',
@@ -269,9 +271,48 @@ function ByDomainView({ data }) {
   )
 }
 
-function AppShell({ data, onSignOut }) {
+function HqHome({ data }) {
   const [tab, setTab] = useState('Monday Review')
 
+  return (
+    <>
+      <nav className="tabs hq-subtabs">
+        {HQ_TABS.map((t) => (
+          <button key={t} className={`tab-btn ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
+            {t}
+          </button>
+        ))}
+      </nav>
+
+      {data.loading && <p className="proposals-note">Loading…</p>}
+      {data.error && <p className="lt-btn-close">Error: {data.error.message}</p>}
+
+      {!data.loading && !data.error && (
+        <>
+          {tab === 'Monday Review' && <MondayReviewView data={data} />}
+          {tab === 'By Band' && <ByBandView data={data} />}
+          {tab === 'By Domain' && <ByDomainView data={data} />}
+        </>
+      )}
+    </>
+  )
+}
+
+function TopNav({ className }) {
+  const linkClass = ({ isActive }) => `tab-btn ${isActive ? 'active' : ''}`
+  return (
+    <nav className={className}>
+      <NavLink to="/" end className={linkClass}>
+        HQ
+      </NavLink>
+      <NavLink to="/crm" className={linkClass}>
+        CRM
+      </NavLink>
+    </nav>
+  )
+}
+
+function AppShell({ data, onSignOut }) {
   return (
     <div className="app">
       <aside className="sidebar">
@@ -279,13 +320,7 @@ function AppShell({ data, onSignOut }) {
           <h1>Portfolio HQ</h1>
           <p className="tagline">Personal task management for a multi-venture portfolio.</p>
         </div>
-        <nav className="tabs">
-          {TABS.map((t) => (
-            <button key={t} className={`tab-btn ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
-              {t}
-            </button>
-          ))}
-        </nav>
+        <TopNav className="tabs" />
         <button className="signout-btn" onClick={onSignOut}>
           Sign out
         </button>
@@ -295,24 +330,13 @@ function AppShell({ data, onSignOut }) {
         <div className="mobile-brand">
           <h1>Portfolio HQ</h1>
         </div>
-        <nav className="tabs mobile-tabs">
-          {TABS.map((t) => (
-            <button key={t} className={`tab-btn ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
-              {t}
-            </button>
-          ))}
-        </nav>
+        <TopNav className="tabs mobile-tabs" />
 
-        {data.loading && <p className="proposals-note">Loading…</p>}
-        {data.error && <p className="lt-btn-close">Error: {data.error.message}</p>}
-
-        {!data.loading && !data.error && (
-          <>
-            {tab === 'Monday Review' && <MondayReviewView data={data} />}
-            {tab === 'By Band' && <ByBandView data={data} />}
-            {tab === 'By Domain' && <ByDomainView data={data} />}
-          </>
-        )}
+        <Routes>
+          <Route path="/" element={<HqHome data={data} />} />
+          <Route path="/crm/*" element={<CrmLanding />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
     </div>
   )
