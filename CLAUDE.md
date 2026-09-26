@@ -49,6 +49,15 @@ no new views, no gate logic in the app. If I ask you to build stage-gate
 features before MVP ships and survives a month of real-data use, refuse
 and point me to PLAYGROUND.md.
 
+## Where this repo lives — two PCs
+
+This repo is a local clone at `C:\Users\dnbar\Dreamhouse-Repos\portfolio-hq\` on each PC. It is
+not synced by OneDrive: GitHub is the only way code moves between machines. **Start every
+session with `git pull`** and end it with a push. Uncommitted work does not reach the other PC.
+Gitignored files this repo needs (`.env.local`, `.supabase-db-password`) live in
+`C:\Users\dnbar\OneDrive\Dreamhouse\repo-support\portfolio-hq\secrets\`. Edit them there
+first, then copy them in.
+
 ## Vault sync — close session
 
 Trigger: "close session" or similar, typed in this repo's chat.
@@ -56,14 +65,20 @@ Trigger: "close session" or similar, typed in this repo's chat.
 This repo's chat and the AI-Framework vault chat are separate sessions with no shared
 memory — the only thing that carries status between them is what gets written to disk. On
 close, write a status line back to this repo's vault project record at
-`../10-projects/portfolio-hq/_project.md` (relative to this repo's root): update
-`next_action` (what to pick up next, plain language, specific enough that the vault chat can
-report it without re-deriving it from commits) and `stage` (intake | scoping | active |
+`C:\Users\dnbar\OneDrive\Dreamhouse\AI-Framework\10-projects\portfolio-hq\_project.md`
+(absolute path — the vault is outside this repo, and the path is identical on both PCs):
+update `next_action` (what to pick up next, plain language, specific enough that the vault chat
+can report it without re-deriving it from commits) and `stage` (intake | scoping | active |
 review | ratified | parked | closed) to reflect this session, and set `updated:` to today's
 date (ISO `YYYY-MM-DD`). Leave every other field alone. Do not put code, diffs, or detailed
 session narrative there — this repo's own commit history and `MVP.md`/`PLAYGROUND.md` are
-the record of *what* happened; the vault record is only *where things stand*. Commit the
-`_project.md` change as part of this repo's normal close-out, same as any other file.
+the record of *what* happened; the vault record is only *where things stand*.
+
+That file belongs to the **vault's** git repo, not this one. Commit only that file there, then
+push it:
+`git -C "C:\Users\dnbar\OneDrive\Dreamhouse\AI-Framework" commit -m "portfolio-hq: status sync" -- 10-projects/portfolio-hq/_project.md`,
+then `git -C "C:\Users\dnbar\OneDrive\Dreamhouse\AI-Framework" push`. Stage nothing else in
+the vault.
 
 If a chat closes without doing this, the vault will report a stale status next time anyone
 opens it there — flag that risk rather than silently skipping the step.
