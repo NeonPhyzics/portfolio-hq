@@ -36,3 +36,13 @@ deleted from the database either — see CLAUDE.md working rules.
   dynamic across devices — so this is a config fix, not an architecture
   change. Fix: add the app's URLs to Supabase Auth → URL Configuration →
   Redirect URLs.
+- **Local-first data layer (replace live Supabase dependency for reads)** —
+  Supabase project manually paused 2026-09-03; app currently has no local
+  fallback (`usePortfolioData.js`/`useAuth.js` hit Supabase directly, no
+  offline path). David built a similar tool at work that renders locally
+  and records dates in the architecture — precedent to pull from once this
+  is scoped. Needs definition before build: what "records dates in the
+  architecture" means here (local timestamped event log? periodic snapshot
+  export? CRDT/sync-on-reconnect?), and whether this replaces Supabase
+  entirely or just covers the paused/offline case. Not started — requirements
+  said to have changed, but nothing scoped yet.
