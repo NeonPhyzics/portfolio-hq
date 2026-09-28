@@ -2,7 +2,7 @@
 // opens the browser; close the terminal to stop it.
 import { createServer } from 'node:http'
 import { exec } from 'node:child_process'
-import { readProjects, inboxCount, writeInboxNote, localDate, VAULT } from './vault.js'
+import { readProjects, groupByTier, inboxCount, writeInboxNote, localDate, VAULT } from './vault.js'
 import { renderPage } from './page.js'
 
 const HOST = '127.0.0.1'
@@ -36,7 +36,7 @@ const server = createServer(async (req, res) => {
   try {
     if (req.method === 'GET' && req.url === '/') {
       const [projects, inbox] = await Promise.all([readProjects(), inboxCount()])
-      return send(res, 200, 'text/html; charset=utf-8', renderPage({ projects, inbox, today: localDate() }))
+      return send(res, 200, 'text/html; charset=utf-8', renderPage({ groups: groupByTier(projects), inbox, today: localDate() }))
     }
     if (req.method === 'POST' && req.url === '/note') {
       if (!sameOrigin(req)) return json(res, 403, { error: 'Forbidden' })

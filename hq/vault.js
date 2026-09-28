@@ -9,6 +9,11 @@ const PROJECTS = join(VAULT, '10-projects')
 const INBOX = join(VAULT, '00-inbox')
 
 const STALE_DAYS = 21
+// Vault stage vocabulary: intake | scoping | active | review | ratified | parked | closed.
+// Parked/closed projects aren't expected to move, so they never raise flags.
+const INACTIVE = new Set(['parked', 'closed'])
+// Tier order matches INDEX.md; unknown tiers follow, then projects with no tier.
+const TIER_ORDER = ['non-discretionary', 'discretionary', 'choose']
 
 // Minimal YAML frontmatter reader for the shapes _project.md actually uses:
 // scalars, quoted scalars, folded continuation lines, [] / [a, b] and "- item" lists.
@@ -83,28 +88,47 @@ export async function readProjects() {
     const nextReview = str(data.next_review)
     const updated = str(data.updated)
     const blocked = data.blocked_by
+    const stage = str(data.stage).toLowerCase()
+    const inactive = INACTIVE.has(stage)
+    const overdueDays = !inactive && nextReview && nextReview < today ? daysBetween(nextReview, today) : 0
+    const sinceUpdate = updated ? daysBetween(updated, today) : 0
     projects.push({
       id: str(data.id) || dir.name,
       title: str(data.title) || dir.name,
-      tier: str(data.tier),
+      tier: str(data.tier).toLowerCase(),
       category: str(data.category),
-      stage: str(data.stage),
+      value: str(String(data.value ?? '')),
+      effort: str(String(data.effort ?? '')),
+      stage,
+      inactive,
       nextAction: str(data.next_action),
       nextReview,
       updated,
       repo: str(data.repo),
       blockedBy: Array.isArray(blocked) ? blocked : blocked ? [blocked] : [],
       openQuestions: openQuestions(body),
-      overdue: nextReview !== '' && nextReview < today,
-      staleDays: updated && daysBetween(updated, today) > STALE_DAYS ? daysBetween(updated, today) : 0,
+      overdue: overdueDays > 0,
+      overdueDays,
+      staleDays: !inactive && sinceUpdate > STALE_DAYS ? sinceUpdate : 0,
+      missingNextAction: !inactive && !str(data.next_action),
+      missingReview: !inactive && !nextReview,
     })
   }
-  // Overdue first (oldest review first), then by next review; no review date last.
+  // Within a tier: overdue first, then by next review (none last); parked/closed at the end.
+  const key = d => d || '9999'
   projects.sort((a, b) =>
+    (a.inactive - b.inactive) ||
     (b.overdue - a.overdue) ||
-    ((a.nextReview || '9999') < (b.nextReview || '9999') ? -1 : (a.nextReview || '9999') > (b.nextReview || '9999') ? 1 : 0) ||
+    (key(a.nextReview) < key(b.nextReview) ? -1 : key(a.nextReview) > key(b.nextReview) ? 1 : 0) ||
     a.title.localeCompare(b.title))
   return projects
+}
+
+// [{ tier, projects }] in INDEX.md order.
+export function groupByTier(projects) {
+  const rank = t => (TIER_ORDER.includes(t) ? TIER_ORDER.indexOf(t) : t ? TIER_ORDER.length : TIER_ORDER.length + 1)
+  const tiers = [...new Set(projects.map(p => p.tier))].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b))
+  return tiers.map(tier => ({ tier, projects: projects.filter(p => p.tier === tier) }))
 }
 
 export async function inboxCount() {
