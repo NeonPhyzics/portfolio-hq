@@ -1,8 +1,9 @@
 # AGENTS.md — portfolio-hq
 
 Rules for Codex (and any non-Claude agent) working in this repo. Also read `CLAUDE.md` for the
-project's own rules; skip its "Vault sync — close session" section, which is a Claude Code
-step. `MVP.md` is the scope contract; ideas beyond it go in `PLAYGROUND.md`, not into code.
+project's own rules and hard boundaries; skip its "Vault sync — close session" section, which is
+a Claude Code step. `CLAUDE.md` done_when is the scope contract; ideas beyond it go in
+`PLAYGROUND.md`, not into code.
 
 ## Where you are working
 
@@ -34,7 +35,7 @@ step. `MVP.md` is the scope contract; ideas beyond it go in `PLAYGROUND.md`, not
 ## Boundaries
 
 - Don't edit anything outside this repo. David's `AI-Framework` vault is updated from Claude
-  Code sessions, which read your handoff.
-- Gitignored secrets (`.env.local`, `.supabase-db-password`) live in
-  `C:\Users\dnbar\OneDrive\Dreamhouse\repo-support\portfolio-hq\secrets\`. Never commit them.
-  If one is missing, ask David.
+  Code sessions, which read your handoff. The running tool itself may only create new files in
+  the vault's `00-inbox/` — don't widen that. When testing note writes, point `HQ_VAULT` at a
+  scratch folder, not the real vault.
+- The tool needs no secrets and no npm dependencies. Don't add either without David's go-ahead.

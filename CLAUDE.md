@@ -1,62 +1,56 @@
 # Portfolio HQ — CLAUDE.md
 
 ## Purpose
-Personal task management PWA for a multi-venture portfolio. Also my learning
-vehicle for Git, Supabase, and Claude Code. The tool must ship; the learning
-is a byproduct, not a license for scope creep.
+A local, read-mostly quick view of my portfolio: one card per project in the
+AI-Framework vault (`10-projects/*/_project.md`), showing stage, next action,
+blockers, open questions, and overdue/stale flags. Plus a note box that drops a
+capture file into the vault's `00-inbox/` for the next vault session to triage.
 
-## MVP — done_when (this defines "pencils down")
-- [x] Tasks CRUD backed by Supabase
-- [x] Every task has: title, notes, band (1-4), domain (Business | Household),
-      urgency, status, due date (optional)
-- [x] Default sort: band ascending, then urgency. Band always sorts first.
-- [x] Filtered views: by band, by domain, and a combined "Monday review" view
-      showing open Band 1 tasks first
-- [x] Installable/usable as a PWA on mobile
-- [x] Existing task data migrated in
+It replaced a full Supabase-backed task/CRM app (2026-09-28) because that was
+more project management than I need. The vault is the system of record; this
+tool only shows it. Keep it small and boring.
 
-MVP shipped 2026-08-20 (confirmed). Calendar and Exit Ready HR CRM are approved
-next builds, scoped into this app rather than PLAYGROUND.md — see MVP.md for
-the next punch list. Post-MVP: main stays stable, experiments on feature
-branches (see Working rules).
+## done_when (the contract — "pencils down")
+- [ ] `npm run hq` starts the local server and opens the quick view of every
+      project in `10-projects/` (folders starting with `_` skipped)
+- [ ] Each card shows stage, next action, blockers, open questions;
+      overdue reviews and stale records are flagged and sorted first
+- [ ] Notes from a card or the general box land in `00-inbox/` in the vault's
+      capture format, and the page shows the inbox count
+- [ ] Old app code removed; CLAUDE.md / MVP.md / PLAYGROUND.md rewritten
+- [ ] Merged to main
 
-## Band taxonomy (fixed — do not add bands)
-1 = Core Business (Exit Ready HR: pipeline, offers, delivery)
-2 = Business Tools (books, one-time setups; done-is-done)
-3 = Tools + Learning (fixed R&D budget; skill is the deliverable)
-4 = Hobbies (leftover time only)
-Domain flag is separate from band: Business or Household.
+## Hard boundaries
+- **Write path is `00-inbox/` only, new files only.** Never edit, move, or
+  delete anything else in the vault — not `_project.md`, not inbox notes.
+  Filing notes and updating project status is the vault session's job.
+- **No list/edit/delete of inbox notes in the UI.** That's the vault's Triage
+  inbox job. Adding it is how this turns back into a PM tool.
+- **Local only.** Server binds 127.0.0.1 and rejects cross-origin POSTs. No
+  hosting, no database, no auth, no npm dependencies (Node standard library).
+- Note format follows the vault's capture convention:
+  `00-inbox/YYYY-MM-DD-HHmm-<slug>.md`, frontmatter `captured:` + `source:`,
+  note text verbatim. The project goes in `source:` as a hint only — the vault
+  says capture time never files or categorises.
+
+## Layout
+- `hq/server.js` — local HTTP server (`GET /` page, `POST /note`)
+- `hq/vault.js` — reads project records, counts/writes inbox notes
+- `hq/page.js` — renders the single HTML page
+- Vault path defaults to `C:\Users\dnbar\OneDrive\Dreamhouse\AI-Framework`
+  (same on both PCs); override with `HQ_VAULT`. Port 5180; override with `HQ_PORT`.
 
 ## Working rules
-- Two-track backlog: MVP.md is the punch list to done_when. PLAYGROUND.md is
-  every other idea. If I or you propose anything outside done_when, log it to
-  PLAYGROUND.md and return to the punch list. Never build playground items
-  before MVP ships.
-- Challenge my scope before acting. If a request expands the MVP, say so.
-- Explain the "why" once, briefly, when introducing a new Git/Supabase/Code
-  pattern. Don't over-explain basics.
-- After MVP ships: main branch is stable and boring. All experiments happen
-  on feature branches. Never experiment on main.
-
-## Stage-gate rule (governance, not a feature)
-Band 3 is R&D. A Band 3 venture graduates to Band 1 only when all three
-gate criteria are met:
-1. Commercial trigger (a real client/buyer wants it)
-2. Compliance review cleared
-3. Delivery standard defined
-Graduation = re-banding that venture's tasks from 3 to 1. No new schema,
-no new views, no gate logic in the app. If I ask you to build stage-gate
-features before MVP ships and survives a month of real-data use, refuse
-and point me to PLAYGROUND.md.
+- Anything beyond done_when goes in PLAYGROUND.md, not into code.
+- Challenge my scope before acting. If a request expands the tool, say so.
+- Main is stable; changes happen on feature branches.
 
 ## Where this repo lives — two PCs
 
 This repo is a local clone at `C:\Users\dnbar\Dreamhouse-Repos\portfolio-hq\` on each PC. It is
 not synced by OneDrive: GitHub is the only way code moves between machines. **Start every
 session with `git pull`** and end it with a push. Uncommitted work does not reach the other PC.
-Gitignored files this repo needs (`.env.local`, `.supabase-db-password`) live in
-`C:\Users\dnbar\OneDrive\Dreamhouse\repo-support\portfolio-hq\secrets\`. Edit them there
-first, then copy them in.
+The tool needs no secrets.
 
 ## Vault sync — close session
 
@@ -82,12 +76,3 @@ the vault.
 
 If a chat closes without doing this, the vault will report a stale status next time anyone
 opens it there — flag that risk rather than silently skipping the step.
-
-## Supabase CLI credentials
-
-Use `.\scripts\sb.ps1 <command>` instead of bare `supabase <command>` for any command that
-needs a direct Postgres connection (`migration list`, `db push`, `db reset --linked`, etc.).
-It reads the DB password from a repo-local, gitignored `.supabase-db-password` file and
-scopes it to that one command's process — never the global `SUPABASE_DB_PASSWORD` env var,
-which is shared across every Supabase project on the machine and silently breaks
-cross-project auth. See `.supabase-db-password.example` for setup.

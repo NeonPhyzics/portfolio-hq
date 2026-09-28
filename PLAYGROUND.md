@@ -1,48 +1,29 @@
 # Playground
 
-Parked ideas and existing-but-out-of-scope work. Nothing here gets built
-before MVP.md's done_when ships and survives real use. Nothing here gets
-deleted from the database either — see CLAUDE.md working rules.
+Parked ideas. Nothing here gets built without a deliberate rescope of
+CLAUDE.md's done_when. Earliest consideration: after the quick view has had a
+month of real use.
 
-- **Learning Threads view** — surface the LT-01–LT-05 records with their
-  `done_when`/`build`/`backlog` structure. Data preserved in the DB,
-  untouched; just not built into MVP UI.
-- **Nudges/learning-task generation (agent-populated queue)**:
-  (a) internal source — scheduled scan of session transcripts, propose
-      learning tasks from observed patterns
-  (b) external source — scheduled web check (e.g., Anthropic changelogs),
-      propose "learn X" tasks on relevant releases
-  Requires: HQ task-write API/auth, scheduled task infra (Claude Code/
-  Cowork), proposal-approval flow (nothing auto-enters Band 3 without my
-  sign-off)
-  Trigger to activate: HQ MVP shipped + 30 days real use, AND Band 3 has
-  spare R&D budget after career tool closes
-- **Critical path / dependency features** — anything beyond the single
-  frozen `blocked_by` column: multi-dependency graphs, critical-path
-  calculation, dependency visualization, cascading logic.
-- **Stage-gate view** — venture-level R&D vs. commercialized status with a
-  gate-criteria checklist (commercial trigger / compliance review / delivery
-  standard). Earliest consideration: post-MVP + 30 days of real use.
-- **Venture/Active-Project card views** — the current Ventures and Active
-  Projects tabs (venture summary cards, "next action" derivation). Being
-  dropped from MVP nav in favor of Band/Domain views; the underlying
-  `ventures`/`projects` tables aren't deleted, just unused by the UI.
-- **Auth email redirect goes to Supabase instead of the app** — sign-up/
-  magic-link emails redirect to a Supabase URL instead of back to the app.
-  `src/lib/useAuth.js` already sets `emailRedirectTo` correctly to
-  `window.location.origin + pathname`; the likely cause is Supabase's Auth
-  "Redirect URLs" allowlist not including localhost/prod URLs, causing a
-  silent fallback. Supabase is the right call here — data needs to be
-  dynamic across devices — so this is a config fix, not an architecture
-  change. Fix: add the app's URLs to Supabase Auth → URL Configuration →
-  Redirect URLs.
-- **Local-first data layer (replace live Supabase dependency for reads)** —
-  Supabase project manually paused 2026-09-03; app currently has no local
-  fallback (`usePortfolioData.js`/`useAuth.js` hit Supabase directly, no
-  offline path). David built a similar tool at work that renders locally
-  and records dates in the architecture — precedent to pull from once this
-  is scoped. Needs definition before build: what "records dates in the
-  architecture" means here (local timestamped event log? periodic snapshot
-  export? CRDT/sync-on-reconnect?), and whether this replaces Supabase
-  entirely or just covers the paused/offline case. Not started — requirements
-  said to have changed, but nothing scoped yet.
+## Ideas for the quick view
+- **Phone access** — would need a hosted copy of the vault data (sync or
+  export), which brings back hosting/auth. Dropped on purpose 2026-09-28.
+- **Inbox list/edit/delete in the UI** — deliberately out; triage stays in
+  the vault session. Adding it is the first step back to a PM tool.
+- **Links into the vault** — open a project's folder or `_project.md` from its
+  card (browsers block `file://` from an http page; would need a server route
+  that shells out to Explorer/Obsidian).
+- **Latest `30-log/` entry or repo `docs/handoffs/` summary on each card.**
+
+## Retired with the old app (2026-09-28)
+The Supabase task app was replaced by the quick view. All of this code and its
+data model live in git history (last commit: `1f278d0`); the Supabase project
+is paused, not deleted.
+- **Exit Ready HR CRM** (Companies/Contacts/Opportunities/Follow-ups) and the
+  **venture calendar** — previously approved next builds; parked.
+- **Band taxonomy (1–4), domain flag, urgency sort, Monday review view, and
+  the Band 3 → Band 1 stage-gate rule** — task-system concepts; the vault uses
+  tier/category instead.
+- **Learning Threads view, nudges/learning-task generation, critical-path /
+  dependency features, venture/project card views.**
+- **Auth email redirect fix** and **local-first data layer** — moot now; no
+  Supabase dependency.
