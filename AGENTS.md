@@ -38,4 +38,12 @@ a Claude Code step. `CLAUDE.md` done_when is the scope contract; ideas beyond it
   Code sessions, which read your handoff. The running tool itself may only create new files in
   the vault's `00-inbox/` — don't widen that. When testing note writes, point `HQ_VAULT` at a
   scratch folder, not the real vault.
+- **One exception — capturing ideas for the vault.** When David asks you to capture an idea or
+  note, create one new file in `C:\Users\dnbar\OneDrive\Dreamhouse\AI-Framework\00-inbox\`
+  named `YYYY-MM-DD-HHmm-<slug>.md` (24-hour local time, lowercase-kebab-case slug). Start it
+  with frontmatter `captured: YYYY-MM-DD HH:mm` and `source: codex (portfolio-hq)`, then the note.
+  Create only: never edit, move, or delete anything in the vault, don't read other vault files,
+  and never run git there. Claude Code triages the inbox. Never name a person as the subject of
+  pay, benefits, health, performance, or personnel details. If your sandbox blocks the write,
+  ask David to approve it; don't work around it.
 - The tool needs no secrets and no npm dependencies. Don't add either without David's go-ahead.
